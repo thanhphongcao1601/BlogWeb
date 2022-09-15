@@ -10,23 +10,64 @@ import {
   Stack,
   Image,
 } from "@chakra-ui/react";
-import { Link as ReachLink } from "react-router-dom"
+import { useState } from "react";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { Auths } from "../api/authRequest";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errMessage, setErrMessage] = useState("");
+
+  let navigate = useNavigate();
+  function handleLogin() {
+    Auths.login({ email: email, password: password })
+      .then((response) => {
+        if (response.status === "success") {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userName", response.data.userName);
+
+          navigate("/", { replace: true });
+        }
+      })
+      .catch((error) => {
+        setErrMessage("Username and password is not valid!");
+      });
+  }
+
   return (
     <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
       <Flex p={8} flex={1} align={"center"} justify={"center"}>
         <Stack spacing={4} w={"full"} maxW={"md"}>
           <Heading fontSize={"2xl"}>Sign in to your account</Heading>
+          {errMessage ? (
+            <Text textAlign={"center"} color={"red"}>
+              {errMessage}
+            </Text>
+          ) : null}
           <FormControl id="email">
             <FormLabel>Email address</FormLabel>
-            <Input type="email" />
+            <Input
+              value={email}
+              type="email"
+              onChange={(e) => {
+                setErrMessage("");
+                setEmail(e.target.value);
+              }}
+            />
           </FormControl>
           <FormControl id="password">
             <FormLabel>Password</FormLabel>
-            <Input type="password" />
+            <Input
+              value={password}
+              onChange={(e) => {
+                setErrMessage("");
+                setPassword(e.target.value);
+              }}
+              type="password"
+            />
           </FormControl>
-          <Button colorScheme={"blue"} variant={"solid"}>
+          <Button colorScheme={"blue"} variant={"solid"} onClick={handleLogin}>
             Sign in
           </Button>
           <Text align={"center"}>

@@ -10,8 +10,9 @@ const postSchema = new mongoose.Schema(
     },
     content: {
       type: String,
+      required: [true, "Post must have content"],
     },
-    genre: [
+    genres: [
       {
         type: String,
       },
@@ -20,6 +21,12 @@ const postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );

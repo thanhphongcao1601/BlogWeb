@@ -17,12 +17,40 @@ import {
   Center,
   MenuDivider,
   MenuItem,
-  Link
+  Link,
 } from "@chakra-ui/react";
-import { Link as ReachLink } from "react-router-dom"
+import { useState } from "react";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { Posts } from "../api/postRequest";
+import { Post } from "../models/Post";
+import { SearchItem } from "./SearchItem";
 
 export default function NavBar() {
+  const userName = localStorage.getItem("userName");
   const { colorMode, toggleColorMode } = useColorMode();
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [listSearch, setListSearch] = useState([] as Post[]);
+
+  function handleLogout() {
+    localStorage.clear();
+    navigate("/login", { replace: true });
+  }
+
+  function handleSearch() {
+    Posts.searchPost(searchValue)
+      .then((response) => {
+        const data = response.data;
+        setListSearch((listSearch) => []);
+        data.map((post) =>
+          setListSearch((listSearch) => [...listSearch, post])
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   return (
     <Box
       bg={useColorModeValue("gray.100", "gray.900")}
@@ -43,53 +71,73 @@ export default function NavBar() {
             />
           </Link>
         </Box>
-        <InputGroup size="md" mx="10px" w={"50%"}>
-          <Input placeholder="search blog" borderRadius="lg" border={"2px"} />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm">
-              Search
-            </Button>
-          </InputRightElement>
-        </InputGroup>
+        <Center>
+          <InputGroup position={"absolute"} size="md" w={"50%"}>
+            <Input
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              borderRadius="lg"
+              border={"2px"}
+            />
+            <InputRightElement width="4.5rem">
+              <Button onClick={handleSearch} h="1.75rem" size="sm">
+                Search
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          <Box top="60px" position="absolute" width={"50%"}>
+            {listSearch.map((post) => (
+              <SearchItem
+                key={post._id}
+                postId={post._id || ""}
+                imgLink={post.imgLink || ""}
+                title={post.title || ""}
+                content={post.content || ""}
+              />
+            ))}
+          </Box>
+        </Center>
         <Flex alignItems={"center"}>
           <Stack direction={"row"} spacing={2}>
             <Button onClick={toggleColorMode}>
               {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
             </Button>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded={"full"}
-                variant={"link"}
-                cursor={"pointer"}
-                minW={0}
-              >
-                <Avatar
-                  size={"sm"}
-                  src={"https://avatars.dicebear.com/api/male/username.svg"}
-                />
-              </MenuButton>
-              <MenuList alignItems={"center"}>
-                <br />
-                <Center>
+            {userName ? (
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rounded={"full"}
+                  variant={"link"}
+                  cursor={"pointer"}
+                  minW={0}
+                >
                   <Avatar
-                    size={"2xl"}
+                    size={"sm"}
                     src={"https://avatars.dicebear.com/api/male/username.svg"}
                   />
-                </Center>
-                <br />
-                <Center>
-                  <p>Username</p>
-                </Center>
-                <br />
-                <MenuDivider />
-                <MenuItem>Your Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
-                <MenuItem>
-                  <Link as={ReachLink} to="/login">Logout</Link>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                </MenuButton>
+                <MenuList alignItems={"center"}>
+                  <br />
+                  <Center>
+                    <Avatar
+                      size={"2xl"}
+                      src={"https://avatars.dicebear.com/api/male/username.svg"}
+                    />
+                  </Center>
+                  <br />
+                  <Center>
+                    <p>{userName}</p>
+                  </Center>
+                  <br />
+                  <MenuDivider />
+                  <MenuItem>Your Profile</MenuItem>
+                  <MenuItem>Settings</MenuItem>
+                  <MenuItem>
+                    <Link onClick={handleLogout}>Logout</Link>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            ) : null}
           </Stack>
         </Flex>
       </Flex>

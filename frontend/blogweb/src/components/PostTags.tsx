@@ -1,12 +1,12 @@
 import { HStack, SpaceProps, Tag } from '@chakra-ui/react';
 import React from 'react'
 
-interface IBlogTags {
+interface IPostTags {
     tags: Array<string>;
     marginTop?: SpaceProps["marginTop"];
   }
 
-const BlogTags: React.FC<IBlogTags> = (props) => {
+const PostTags: React.FC<IPostTags> = (props) => {
     return (
       <HStack spacing={2} marginTop={props.marginTop}>
         {props.tags.map((tag) => {
@@ -20,4 +20,4 @@ const BlogTags: React.FC<IBlogTags> = (props) => {
     );
   };
 
-export default BlogTags
+export default PostTags

@@ -1,148 +1,173 @@
 import {
-  Box,
   Heading,
-  Image,
-  Link,
-  Text,
   Divider,
   Wrap,
-  WrapItem,
   Container,
+  Button,
+  Flex,
+  Modal,
+  ModalOverlay,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+  Textarea,
 } from "@chakra-ui/react";
 
-import { BlogAuthor } from "../components/BlogAuthor";
-import { BlogCard } from "../components/BlogCard";
-import BlogTags from "../components/BlogTags";
+import { PostCard } from "../components/PostCard";
+import { Posts } from "../api/postRequest";
+import { useEffect, useState } from "react";
+import { Post } from "../models/Post";
+import React from "react";
 
 function Home() {
+  const userName = localStorage.getItem("userName");
+  const token = localStorage.getItem("token");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = React.useRef(null);
+  const finalRef = React.useRef(null);
+
+  const [listPost, setListPost] = useState([] as Post[]);
+  const [genres, setGenres] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [imgLink, setImgLink] = useState("");
+
+  function handleGetAllPosts() {
+    Posts.getAllPosts()
+      .then((response) => {
+        const data = response.data;
+        setListPost((listPost) => []);
+        data.map((post) => setListPost((listPost) => [...listPost, post]));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function handleSubmit() {
+    let newpost: Post = {
+      genres: genres ? genres.trim().split(",") : ["unknow"],
+      imgLink: imgLink,
+      title: title,
+      content: content,
+    };
+    console.log(newpost);
+    Posts.addPost(newpost, { authorization: `Bearer ${token}` })
+      .then((response) => {
+        handleGetAllPosts();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    handleGetAllPosts();
+  }, []);
+
   return (
-    <Container maxW={"7xl"} p="12" mt={"40px"}>
-      <Heading as="h2">Latest articles</Heading>
-      <Divider marginTop="5" />
-      <Wrap spacing="30px" marginTop="5">
-        <BlogCard
-          imgLink={
-            "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-          }
-          title={"Hoc REactJS"}
-          content={"Đây là widget hầu như có mặt trong tất cả các app lớn nhỏ. Nó cung cấp cho chúng ta rất nhiều thuộc tính rất thông dụng, từ việc thêm màu background(color), hình dạng, margin, padding, kích thước (width, height) cho đến việc sắp xếp, định vị, trang trí cho widget mà nó bao bọc. Nó còn rất linh hoạt trong việc kết hợp với các widget khác để tạo ra"}
-          genre={["IT","Technology"]}
-          author={"Phong Cao"}
-          date={new Date}
-        />
-        <WrapItem width={{ base: "100%", sm: "100%", md: "45%", lg: "30%" }}>
-          <Box w="100%">
-            <Box borderRadius="lg" overflow="hidden">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                <Image
-                  transform="scale(1.0)"
-                  src={
-                    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-                  }
-                  alt="some text"
-                  objectFit="contain"
-                  width="100%"
-                  transition="0.3s ease-in-out"
-                  _hover={{
-                    transform: "scale(1.05)",
-                  }}
-                />
-              </Link>
-            </Box>
-            <BlogTags tags={["Engineering", "Product"]} marginTop="3" />
-            <Heading fontSize="xl" marginTop="2">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                Some blog title
-              </Link>
-            </Heading>
-            <Text as="p" fontSize="md" marginTop="2">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.
-            </Text>
-            <BlogAuthor
-              name="John Doe"
-              date={new Date("2021-04-06T19:01:27Z")}
+    <>
+      <Modal
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create your post</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl mt={4}>
+              <FormLabel>Genres</FormLabel>
+              <Input
+                value={genres}
+                onChange={(e) => setGenres(e.target.value)}
+                placeholder="Ex: sport, technology, ..."
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Title</FormLabel>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                ref={initialRef}
+                placeholder="Title"
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Content</FormLabel>
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                isRequired
+                placeholder="Content"
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Image link</FormLabel>
+              <Input
+                value={imgLink}
+                onChange={(e) => setImgLink(e.target.value)}
+                placeholder="Image link"
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button onClick={handleSubmit} colorScheme="blue" mr={3}>
+              Create
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Container maxW={"7xl"} p="12" mt={"40px"}>
+        <Flex justifyContent={"space-between"}>
+          <Heading as="h2">Latest</Heading>
+          {userName ? (
+            <Button border={"2px"} borderColor={"green.100"} onClick={onOpen}>
+              Add Post
+            </Button>
+          ) : null}
+        </Flex>
+        <Divider marginTop="5" />
+        <Wrap spacing="30px" marginTop="5">
+          {listPost.map((post) => (
+            <PostCard
+              postId={post._id || ""}
+              key={post._id}
+              imgLink={post.imgLink || ""}
+              title={post.title || "No title"}
+              content={post.content || ""}
+              genres={post.genres.length > 0 ? [...post.genres] : ["unknow"]}
+              author={post.author?.name || ""}
+              date={new Date(post.createdAt || "")}
             />
-          </Box>
-        </WrapItem>
-        <WrapItem width={{ base: "100%", sm: "100%", md: "45%", lg: "30%" }}>
-          <Box w="100%">
-            <Box borderRadius="lg" overflow="hidden">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                <Image
-                  transform="scale(1.0)"
-                  src={
-                    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-                  }
-                  alt="some text"
-                  objectFit="contain"
-                  width="100%"
-                  transition="0.3s ease-in-out"
-                  _hover={{
-                    transform: "scale(1.05)",
-                  }}
-                />
-              </Link>
-            </Box>
-            <BlogTags tags={["Engineering", "Product"]} marginTop="3" />
-            <Heading fontSize="xl" marginTop="2">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                Some blog title
-              </Link>
-            </Heading>
-            <Text as="p" fontSize="md" marginTop="2">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.
-            </Text>
-            <BlogAuthor
-              name="John Doe"
-              date={new Date("2021-04-06T19:01:27Z")}
-            />
-          </Box>
-        </WrapItem>
-        <WrapItem width={{ base: "100%", sm: "100%", md: "45%", lg: "30%" }}>
-          <Box w="100%">
-            <Box borderRadius="lg" overflow="hidden">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                <Image
-                  transform="scale(1.0)"
-                  src={
-                    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-                  }
-                  alt="some text"
-                  objectFit="contain"
-                  width="100%"
-                  transition="0.3s ease-in-out"
-                  _hover={{
-                    transform: "scale(1.05)",
-                  }}
-                />
-              </Link>
-            </Box>
-            <BlogTags tags={["Engineering", "Product"]} marginTop="3" />
-            <Heading fontSize="xl" marginTop="2">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                Some blog title
-              </Link>
-            </Heading>
-            <Text as="p" fontSize="md" marginTop="2">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.
-            </Text>
-            <BlogAuthor
-              name="John Doe"
-              date={new Date("2021-04-06T19:01:27Z")}
-            />
-          </Box>
-        </WrapItem>
-      </Wrap>
-    </Container>
+          ))}
+          <PostCard
+            postId={"111"}
+            imgLink={
+              "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
+            }
+            title={"Hoc REactJS"}
+            content={
+              "Đây là widget hầu như có mặt trong tất cả các app lớn nhỏ. Nó cung cấp cho chúng ta rất nhiều thuộc tính rất thông dụng, từ việc thêm màu background(color), hình dạng, margin, padding, kích thước (width, height) cho đến việc sắp xếp, định vị, trang trí cho widget mà nó bao bọc. Nó còn rất linh hoạt trong việc kết hợp với các widget khác để tạo ra"
+            }
+            genres={["IT", "Technology"]}
+            author={"Phong Cao"}
+            date={new Date()}
+          />
+        </Wrap>
+      </Container>
+    </>
   );
 }
 
