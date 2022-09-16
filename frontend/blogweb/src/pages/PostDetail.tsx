@@ -12,7 +12,7 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Posts } from "../api/postRequest";
 import { PostAuthor } from "../components/PostAuthor";
 import { PostComment } from "../components/PostComment";
@@ -26,11 +26,15 @@ export default function PostDetail() {
   const [currentPost, setCurrentPost] = useState({} as Post);
   const [newComment, setNewComment] = useState("");
   const params = useParams();
+  const navigate = useNavigate();
 
   function handleComment() {
-    if (!userName) return;
+    if (!userName) {
+      navigate("/login");
+      return;
+    }
 
-    setNewComment("");
+    if (newComment.trim() === "") return setNewComment("");
 
     Posts.updatePost(
       currentPost._id || "",
@@ -39,6 +43,7 @@ export default function PostDetail() {
     )
       .then((response) => {
         const data = response.data;
+        setNewComment("");
         console.log(data);
         handleGetPost();
       })
@@ -51,9 +56,7 @@ export default function PostDetail() {
     Posts.getPost(String(params.postId))
       .then((response) => {
         const data = response.data;
-        console.log(data);
-
-        setCurrentPost((currentPost) => data);
+        setCurrentPost(data);
       })
       .catch((err) => {
         console.log(err);
@@ -112,7 +115,9 @@ export default function PostDetail() {
               readOnly={userName ? false : true}
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Enter your comment"
+              placeholder={
+                userName ? "Enter your comment" : "You have to login to comment"
+              }
             ></Textarea>
             <Flex>
               <Spacer />
@@ -122,7 +127,7 @@ export default function PostDetail() {
                 mt={"5px"}
                 justifyContent="right"
               >
-                Comment
+                {userName ? "Comment" : "Login now"}
               </Button>
             </Flex>
           </Box>

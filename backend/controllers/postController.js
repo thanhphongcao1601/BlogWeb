@@ -91,10 +91,12 @@ exports.deleteOnePost = async (req, res, next) => {
 exports.getOnePost = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const post = await Post.findById(postId).populate({
-      path: "comments",
-      populate: { path: "author", select: "name" },
-    });
+    const post = await Post.findById(postId)
+      .populate("author", "name")
+      .populate({
+        path: "comments",
+        populate: { path: "author", select: "name" },
+      });
 
     res.status(200).json({
       status: "success",
@@ -107,9 +109,27 @@ exports.getOnePost = async (req, res, next) => {
 
 exports.searchPost = async (req, res, next) => {
   const { title } = req.body;
-  console.log(title);
   try {
-    const posts = await Post.find({ title: { $regex: title } })
+    const posts = await Post.find({ title: { $regex: title, $options: "i" } })
+      .populate("author", "name")
+      .populate({
+        path: "comments",
+        populate: { path: "author", select: "name" },
+      });
+    res.status(200).json({
+      status: "success",
+      results: posts.length,
+      data: posts,
+    });
+  } catch (error) {
+    res.json(error);
+  }
+};
+
+exports.filterPost = async (req, res, next) => {
+  const { title } = req.body;
+  try {
+    const posts = await Post.find({ genres: { $regex: title, $options: "i" } })
       .populate("author", "name")
       .populate({
         path: "comments",

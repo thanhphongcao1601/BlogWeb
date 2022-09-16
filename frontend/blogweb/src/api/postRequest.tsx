@@ -52,4 +52,6 @@ export const Posts = {
     postRequests.patch(`/posts/${postId}`, fields, header),
   searchPost: (title: string): Promise<PostsRespone> =>
     searchRequest.post(`/posts/search`, title),
+  filterPost: (genre: string): Promise<PostsRespone> =>
+    searchRequest.post(`/posts/filter`, genre),
 };

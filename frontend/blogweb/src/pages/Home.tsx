@@ -17,6 +17,7 @@ import {
   ModalHeader,
   useDisclosure,
   Textarea,
+  Select,
 } from "@chakra-ui/react";
 
 import { PostCard } from "../components/PostCard";
@@ -53,14 +54,14 @@ function Home() {
 
   function handleSubmit() {
     let newpost: Post = {
-      genres: genres ? genres.trim().split(",") : ["unknow"],
+      genres: genres ? [genres] : ["other"],
       imgLink: imgLink,
       title: title,
       content: content,
     };
-    console.log(newpost);
     Posts.addPost(newpost, { authorization: `Bearer ${token}` })
       .then((response) => {
+        onClose();
         handleGetAllPosts();
       })
       .catch((err) => {
@@ -87,11 +88,17 @@ function Home() {
           <ModalBody pb={6}>
             <FormControl mt={4}>
               <FormLabel>Genres</FormLabel>
-              <Input
-                value={genres}
-                onChange={(e) => setGenres(e.target.value)}
-                placeholder="Ex: sport, technology, ..."
-              />
+              <Select
+                placeholder="Other"
+                onChange={(e) => {
+                  setGenres(e.target.value);
+                  console.log(e.target.value);
+                }}
+              >
+                <option value="education">Education</option>
+                <option value="technology">Technology</option>
+                <option value="sport">Sport</option>
+              </Select>
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Title</FormLabel>
@@ -140,7 +147,7 @@ function Home() {
         </Flex>
         <Divider marginTop="5" />
         <Wrap spacing="30px" marginTop="5">
-          {listPost.map((post) => (
+          {listPost.reverse().map((post) => (
             <PostCard
               postId={post._id || ""}
               key={post._id}
@@ -157,11 +164,11 @@ function Home() {
             imgLink={
               "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
             }
-            title={"Hoc REactJS"}
+            title={"TEST UI"}
             content={
               "Đây là widget hầu như có mặt trong tất cả các app lớn nhỏ. Nó cung cấp cho chúng ta rất nhiều thuộc tính rất thông dụng, từ việc thêm màu background(color), hình dạng, margin, padding, kích thước (width, height) cho đến việc sắp xếp, định vị, trang trí cho widget mà nó bao bọc. Nó còn rất linh hoạt trong việc kết hợp với các widget khác để tạo ra"
             }
-            genres={["IT", "Technology"]}
+            genres={["Technology"]}
             author={"Phong Cao"}
             date={new Date()}
           />

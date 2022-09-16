@@ -38,6 +38,10 @@ export default function NavBar() {
   }
 
   function handleSearch() {
+    if (searchValue.trim() === "") {
+      setListSearch([]);
+      return;
+    }
     Posts.searchPost(searchValue)
       .then((response) => {
         const data = response.data;
@@ -76,12 +80,14 @@ export default function NavBar() {
             <Input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyUp={handleSearch}
               borderRadius="lg"
               border={"2px"}
+              placeholder="search post"
             />
             <InputRightElement width="4.5rem">
-              <Button onClick={handleSearch} h="1.75rem" size="sm">
-                Search
+              <Button onClick={() => navigate("/filter")} h="1.75rem" size="sm">
+                Filter
               </Button>
             </InputRightElement>
           </InputGroup>

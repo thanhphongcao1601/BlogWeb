@@ -9,6 +9,7 @@ const {
   getOnePost,
   commentPost,
   searchPost,
+  filterPost,
 } = require("../controllers/postController.js");
 
 const Router = express.Router();
@@ -22,5 +23,6 @@ Router.route("/:postId")
   .delete(verifyToken, deleteOnePost);
 
 Router.route("/search").post(searchPost);
+Router.route("/filter").post(filterPost);
 
 module.exports = Router;
