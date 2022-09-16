@@ -38,7 +38,10 @@ export default function SignUp() {
         }
       })
       .catch((error) => {
-        setErrMessage("Username and password is not valid!");
+        console.log(error);
+        setErrMessage(
+          "Email must be unique and password be at least 6 character"
+        );
       });
   }
 
@@ -65,11 +68,19 @@ export default function SignUp() {
           p={8}
         >
           <Stack spacing={4} w="400px">
+            {errMessage ? (
+              <Text textAlign={"center"} color={"red"}>
+                {errMessage}
+              </Text>
+            ) : null}
             <FormControl id="firstName" isRequired>
               <FormLabel>Full Name</FormLabel>
               <Input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setErrMessage("");
+                }}
                 type="text"
               />
             </FormControl>
@@ -77,7 +88,10 @@ export default function SignUp() {
               <FormLabel>Email address</FormLabel>
               <Input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrMessage("");
+                }}
                 type="email"
               />
             </FormControl>
@@ -86,7 +100,10 @@ export default function SignUp() {
               <InputGroup>
                 <Input
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrMessage("");
+                  }}
                   type={showPassword ? "text" : "password"}
                 />
                 <InputRightElement h={"full"}>

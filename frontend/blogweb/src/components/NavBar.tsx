@@ -143,7 +143,13 @@ export default function NavBar() {
                   </MenuItem>
                 </MenuList>
               </Menu>
-            ) : null}
+            ) : (
+              <Box paddingTop="10px">
+                <Link as={ReachLink} to="/login">
+                  Login
+                </Link>
+              </Box>
+            )}
           </Stack>
         </Flex>
       </Flex>

@@ -1,16 +1,17 @@
 import axios, { AxiosResponse } from "axios";
+import { AppSettings } from "../helper/constant";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: AppSettings.BASE_URL,
   timeout: 15000,
 });
 
 const responseBody = (response: AxiosResponse) => response.data;
 
 const authRequests = {
-  get: (url: string) => instance.get<UserRespone>(url).then(responseBody),
+  get: (url: string) => instance.get<UserResponse>(url).then(responseBody),
   post: (url: string, body: UserInput) =>
-    instance.post<UserRespone>(url, body).then(responseBody),
+    instance.post<UserResponse>(url, body).then(responseBody),
 };
 
 interface UserInput {
@@ -19,14 +20,14 @@ interface UserInput {
   password: string;
 }
 
-interface UserRespone {
+interface UserResponse {
   data: { userName: string; userId: string; token: string };
   status: string;
 }
 
 export const Auths = {
-  login: (userInput: UserInput): Promise<UserRespone> =>
-    authRequests.post(`/auth/login`, userInput),
-  register: (userInput: UserInput): Promise<UserRespone> =>
-    authRequests.post(`/auth/register`, userInput),
+  login: (userInput: UserInput): Promise<UserResponse> =>
+    authRequests.post(AppSettings.LOGIN_URL, userInput),
+  register: (userInput: UserInput): Promise<UserResponse> =>
+    authRequests.post(AppSettings.REGISTER_URL, userInput),
 };

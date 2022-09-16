@@ -42,9 +42,7 @@ export default function PostDetail() {
       { Authorization: `Bearer ${token}` }
     )
       .then((response) => {
-        const data = response.data;
         setNewComment("");
-        console.log(data);
         handleGetPost();
       })
       .catch((err) => {
@@ -91,7 +89,7 @@ export default function PostDetail() {
           tags={
             currentPost.genres?.length > 0
               ? [...currentPost.genres]
-              : ["unknow"]
+              : ["unknown"]
           }
           marginTop="3"
         />
@@ -132,14 +130,17 @@ export default function PostDetail() {
             </Flex>
           </Box>
         </HStack>
-        {currentPost.comments?.map((comment) => (
-          <PostComment
-            key={comment._id}
-            name={comment.author?.name}
-            date={new Date(comment.createdAt)}
-            comment={comment.content}
-          />
-        ))}
+        {currentPost.comments
+          ?.slice(0)
+          .reverse()
+          .map((comment) => (
+            <PostComment
+              key={comment._id}
+              name={comment.author?.name}
+              date={new Date(comment.createdAt)}
+              comment={comment.content}
+            />
+          ))}
       </Box>
     </Container>
   );

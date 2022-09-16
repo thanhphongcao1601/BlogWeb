@@ -1,8 +1,9 @@
 import axios, { AxiosRequestHeaders, AxiosResponse } from "axios";
+import { AppSettings } from "../helper/constant";
 import { Post } from "../models/Post";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: AppSettings.BASE_URL,
   timeout: 15000,
 });
 
@@ -25,33 +26,33 @@ const searchRequest = {
     instance.post<Post>(url, { title: title }).then(responseBody),
 };
 
-interface PostsRespone {
+interface PostsResponse {
   data: Post[];
   result: number;
   status: string;
 }
 
-interface PostRespone {
+interface PostResponse {
   data: Post;
   status: string;
 }
 
 export const Posts = {
-  getAllPosts: (): Promise<PostsRespone> => postRequests.get("/posts"),
-  getPost: (postId: string): Promise<PostRespone> =>
+  getAllPosts: (): Promise<PostsResponse> => postRequests.get("/posts"),
+  getPost: (postId: string): Promise<PostResponse> =>
     postRequests.get(`/posts/${postId}`),
-  addPost: (post: Post, header?: AxiosRequestHeaders): Promise<PostRespone> =>
+  addPost: (post: Post, header?: AxiosRequestHeaders): Promise<PostResponse> =>
     postRequests.post(`/posts`, post, header),
-  deletePost: (postId: string): Promise<PostRespone> =>
+  deletePost: (postId: string): Promise<PostResponse> =>
     postRequests.delete(`/posts/${postId}`),
   updatePost: (
     postId: string,
     fields: Object,
     header: AxiosRequestHeaders
-  ): Promise<PostRespone> =>
+  ): Promise<PostResponse> =>
     postRequests.patch(`/posts/${postId}`, fields, header),
-  searchPost: (title: string): Promise<PostsRespone> =>
+  searchPost: (title: string): Promise<PostsResponse> =>
     searchRequest.post(`/posts/search`, title),
-  filterPost: (genre: string): Promise<PostsRespone> =>
+  filterPost: (genre: string): Promise<PostsResponse> =>
     searchRequest.post(`/posts/filter`, genre),
 };

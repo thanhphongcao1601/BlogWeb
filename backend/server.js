@@ -1,9 +1,6 @@
 //dotenv
 require("dotenv").config();
-//connect DB
-const { connectDB } = require("./configs/db");
-connectDB();
-
+const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const authRoute = require("./routes/authRoute");
@@ -30,7 +27,24 @@ app.all("*", (req, res, next) => {
 });
 app.use(errorHandler);
 
-const port = process.env.APP_PORT;
-app.listen(port, () => {
-  console.log(`Server is running on ${port}`);
-});
+const PORT = process.env.APP_PORT;
+const URI = process.env.DB_URI;
+try {
+  mongoose.connect(
+    URI,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    },
+    (err) => {
+      if (err) throw err;
+      console.log("CONNECTED TO MONGODB");
+      app.listen(PORT, () => {
+        console.log("Server is running");
+      });
+    }
+  );
+} catch (error) {
+  console.log(error);
+  process.exit(1);
+}
