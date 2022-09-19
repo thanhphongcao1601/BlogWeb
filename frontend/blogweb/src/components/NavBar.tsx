@@ -2,7 +2,6 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
-  useColorMode,
   useColorModeValue,
   Image,
   InputGroup,
@@ -19,41 +18,22 @@ import {
   MenuItem,
   Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { Posts } from "../api/postRequest";
-import { Post } from "../models/Post";
+import { Link as ReachLink } from "react-router-dom";
+import { useNavBar } from "./NavBar.hooks";
 import { SearchItem } from "./SearchItem";
 
 export default function NavBar() {
-  const userName = localStorage.getItem("userName");
-  const { colorMode, toggleColorMode } = useColorMode();
-  const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState("");
-  const [listSearch, setListSearch] = useState([] as Post[]);
-
-  function handleLogout() {
-    localStorage.clear();
-    navigate("/login", { replace: true });
-  }
-
-  function handleSearch() {
-    if (searchValue.trim() === "") {
-      setListSearch([]);
-      return;
-    }
-    Posts.searchPost(searchValue)
-      .then((response) => {
-        const data = response.data;
-        setListSearch((listSearch) => []);
-        data.map((post) =>
-          setListSearch((listSearch) => [...listSearch, post])
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  const {
+    userName,
+    colorMode,
+    toggleColorMode,
+    searchValue,
+    setSearchValue,
+    listSearch,
+    handleLogout,
+    handleSearch,
+    navigate
+  } = useNavBar();
 
   return (
     <Box

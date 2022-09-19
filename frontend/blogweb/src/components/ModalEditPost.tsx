@@ -13,28 +13,73 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import React from "react";
-import { useHome } from "../pages/Home.hooks";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Posts } from "../api/postRequest";
+import { Post } from "../models/Post";
+import { usePostDetail } from "../pages/PostDetail.hooks";
 
 interface UserDisclosureProps {
+  currentPost: Post;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 }
 
-export const ModalCreatePost: React.FC<UserDisclosureProps> = (props) => {
+export const ModalEditPost: React.FC<UserDisclosureProps> = (props) => {
+  const token = localStorage.getItem("token");
   const initialRef = React.useRef(null);
   const finalRef = React.useRef(null);
-  const {
-    setGenres,
-    title,
-    setTitle,
-    content,
-    setContent,
-    imgLink,
-    setImgLink,
-    handleSubmit,
-  } = useHome();
+  const [genres, setGenres] = useState([] as string[]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [imgLink, setImgLink] = useState("");
+  const navigate = useNavigate();
+
+  function initCurrentValue() {
+    setGenres(props.currentPost.genres ?? []);
+    setTitle(props.currentPost.title);
+    setContent(props.currentPost.content);
+    setImgLink(props.currentPost.imgLink ?? "");
+  }
+
+  function handleDeletePost() {
+    Posts.deletePost(props.currentPost._id ?? "", {
+      Authorization: `Bearer ${token}`,
+    })
+      .then((response) => {
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function handleEditPost(onClose: () => void) {
+    let newPost: Post = {
+      genres: genres?.at(0) ? genres : ["other"],
+      imgLink: imgLink,
+      title: title,
+      content: content,
+    };
+
+    Posts.updatePost(
+      props.currentPost._id!,
+      { ...newPost },
+      { Authorization: `Bearer ${token}` }
+    )
+      .then((response) => {
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  useEffect(() => {
+    if (props.currentPost._id !== undefined) {
+      initCurrentValue();
+    }
+  }, [props.currentPost._id]);
 
   return (
     <Modal
@@ -51,10 +96,10 @@ export const ModalCreatePost: React.FC<UserDisclosureProps> = (props) => {
           <FormControl mt={4}>
             <FormLabel>Genres</FormLabel>
             <Select
+              value={genres?.at(0) ?? "other"}
               placeholder="Other"
               onChange={(e) => {
                 setGenres([e.target.value]);
-                console.log(e.target.value);
               }}
             >
               <option value="education">Education</option>
@@ -92,11 +137,19 @@ export const ModalCreatePost: React.FC<UserDisclosureProps> = (props) => {
 
         <ModalFooter>
           <Button
-            onClick={() => handleSubmit(props.onClose)}
+            bg="tomato"
+            onClick={() => handleDeletePost()}
+            colorScheme="red"
+            mr={3}
+          >
+            Delete
+          </Button>
+          <Button
+            onClick={() => handleEditPost(props.onClose)}
             colorScheme="blue"
             mr={3}
           >
-            Create
+            Save
           </Button>
           <Button onClick={props.onClose}>Cancel</Button>
         </ModalFooter>

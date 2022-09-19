@@ -8,26 +8,11 @@ import {
 } from "@chakra-ui/react";
 
 import { PostCard } from "../components/PostCard";
-import { Posts } from "../api/postRequest";
-import { useEffect, useState } from "react";
-import { Post } from "../models/Post";
+import { useEffect } from "react";
+import { useFilter } from "./Filter.hooks";
 
 function Filter() {
-  const [listSearch, setListSearch] = useState([] as Post[]);
-
-  function handleFilter(filterValue: string) {
-    Posts.filterPost(filterValue)
-      .then((response) => {
-        const data = response.data;
-        setListSearch((listSearch) => []);
-        data.map((post) =>
-          setListSearch((listSearch) => [...listSearch, post])
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  const {listSearch,handleFilter} = useFilter();
 
   useEffect(() => {
     handleFilter("");

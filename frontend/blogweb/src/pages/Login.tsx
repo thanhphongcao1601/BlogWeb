@@ -10,31 +10,19 @@ import {
   Stack,
   Image,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { Auths } from "../api/authRequest";
+import { Link as ReachLink } from "react-router-dom";
+import { useLogin } from "./Login.hooks";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errMessage, setErrMessage] = useState("");
-
-  let navigate = useNavigate();
-  function handleLogin() {
-    Auths.login({ email: email, password: password })
-      .then((response) => {
-        if (response.status === "success") {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("userName", response.data.userName);
-
-          navigate("/", { replace: true });
-        }
-      })
-      .catch((error) => {
-        setErrMessage("Username and password is not valid!");
-      });
-  }
-
+  const {
+    errMessage,
+    email,
+    setErrMessage,
+    setEmail,
+    password,
+    setPassword,
+    handleLogin,
+  } = useLogin();
   return (
     <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
       <Flex p={8} flex={1} align={"center"} justify={"center"}>

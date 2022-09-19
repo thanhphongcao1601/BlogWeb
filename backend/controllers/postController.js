@@ -56,9 +56,6 @@ exports.commentPost = async (req, res, next) => {
     const { userId } = req.user;
 
     const comment = await Comment.create({ ...req.body, author: userId });
-    console.log(req.body);
-    console.log(comment);
-    console.log(comment._id);
     const { postId } = req.params;
 
     const post = await Post.findByIdAndUpdate(
@@ -107,7 +104,7 @@ exports.getOnePost = async (req, res, next) => {
   }
 };
 
-exports.searchPost = async (req, res, next) => {
+exports.searchPostByTitle = async (req, res, next) => {
   const { title } = req.body;
   try {
     const posts = await Post.find({ title: { $regex: title, $options: "i" } })
@@ -127,14 +124,34 @@ exports.searchPost = async (req, res, next) => {
 };
 
 exports.filterPost = async (req, res, next) => {
-  const { title } = req.body;
+  const { genres } = req.body;
+  console.log(genres);
   try {
-    const posts = await Post.find({ genres: { $regex: title, $options: "i" } })
+    const posts = await Post.find({
+      //now I use only 1 genre, but future 1 post have many genre ^^
+      genres: { $regex: genres.at(0), $options: "i" },
+    })
       .populate("author", "name")
       .populate({
         path: "comments",
         populate: { path: "author", select: "name" },
       });
+    res.status(200).json({
+      status: "success",
+      results: posts.length,
+      data: posts,
+    });
+  } catch (error) {
+    res.json(error);
+  }
+};
+
+exports.getPostByAuthorId = async (req, res, next) => {
+  const { author } = req.body;
+  try {
+    const posts = await Post.find({
+      author: author._id,
+    });
     res.status(200).json({
       status: "success",
       results: posts.length,

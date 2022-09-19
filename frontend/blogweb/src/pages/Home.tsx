@@ -19,7 +19,12 @@ function Home() {
 
   useEffect(() => {
     handleGetAllPosts();
-  });
+    console.log(listPost);
+  },[]);
+
+  useEffect(() => {
+    console.log("res",listPost);
+  },[listPost]);
 
   return (
     <>
@@ -50,19 +55,6 @@ function Home() {
                 date={new Date(post.createdAt || "")}
               />
             ))}
-          <PostCard
-            postId={"111"}
-            imgLink={
-              "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-            }
-            title={"TEST UI"}
-            content={
-              "Đây là widget hầu như có mặt trong tất cả các app lớn nhỏ. Nó cung cấp cho chúng ta rất nhiều thuộc tính rất thông dụng, từ việc thêm màu background(color), hình dạng, margin, padding, kích thước (width, height) cho đến việc sắp xếp, định vị, trang trí cho widget mà nó bao bọc. Nó còn rất linh hoạt trong việc kết hợp với các widget khác để tạo ra"
-            }
-            genres={["Technology"]}
-            author={"Phong Cao"}
-            date={new Date()}
-          />
         </Wrap>
       </Container>
     </>

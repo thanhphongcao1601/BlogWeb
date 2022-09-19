@@ -13,17 +13,20 @@ const postRequests = {
   get: (url: string) => instance.get<Post>(url).then(responseBody),
   post: (url: string, body: Post, header?: AxiosRequestHeaders) =>
     instance.post<Post>(url, body, { headers: header }).then(responseBody),
-  delete: (url: string, header?: AxiosRequestHeaders) =>
+  delete: (url: string, header: AxiosRequestHeaders) =>
     instance.delete<Post>(url, { headers: header }).then(responseBody),
-  put: (url: string, body: Object, header?: AxiosRequestHeaders) =>
+  put: (url: string, body: Post, header?: AxiosRequestHeaders) =>
     instance.put<Post>(url, body, { headers: header }).then(responseBody),
-  patch: (url: string, body: Object, header?: AxiosRequestHeaders) =>
-    instance.patch<Post>(url, body, { headers: header }).then(responseBody),
+  patch: (
+    url: string,
+    body: { content: string },
+    header?: AxiosRequestHeaders
+  ) => instance.patch<Post>(url, body, { headers: header }).then(responseBody),
 };
 
 const searchRequest = {
-  post: (url: string, title: string) =>
-    instance.post<Post>(url, { title: title }).then(responseBody),
+  post: (url: string, postSearch: Post) =>
+    instance.post<Post>(url, postSearch).then(responseBody),
 };
 
 interface PostsResponse {
@@ -43,16 +46,24 @@ export const Posts = {
     postRequests.get(`/posts/${postId}`),
   addPost: (post: Post, header?: AxiosRequestHeaders): Promise<PostResponse> =>
     postRequests.post(`/posts`, post, header),
-  deletePost: (postId: string): Promise<PostResponse> =>
-    postRequests.delete(`/posts/${postId}`),
   updatePost: (
     postId: string,
-    fields: Object,
+    newPost: Post,
+    header?: AxiosRequestHeaders
+  ): Promise<PostResponse> =>
+    postRequests.put(`/posts/${postId}`, newPost, header),
+  deletePost: (postId: string, header: AxiosRequestHeaders): Promise<PostResponse> =>
+    postRequests.delete(`/posts/${postId}`,header),
+  commentPost: (
+    postId: string,
+    fields: { content: string },
     header: AxiosRequestHeaders
   ): Promise<PostResponse> =>
     postRequests.patch(`/posts/${postId}`, fields, header),
   searchPost: (title: string): Promise<PostsResponse> =>
-    searchRequest.post(`/posts/search`, title),
+    searchRequest.post(`/posts/search`, { title: title } as Post),
   filterPost: (genre: string): Promise<PostsResponse> =>
-    searchRequest.post(`/posts/filter`, genre),
+    searchRequest.post(`/posts/filter`, { genres: [genre] } as Post),
+  getPostByAuthorId: (authorId: string): Promise<PostsResponse> =>
+    searchRequest.post(`/posts/userPost`, { author: { _id: authorId } } as Post),
 };
