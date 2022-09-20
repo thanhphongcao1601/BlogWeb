@@ -32,7 +32,7 @@ export default function NavBar() {
     listSearch,
     handleLogout,
     handleSearch,
-    navigate
+    navigate,
   } = useNavBar();
 
   return (
@@ -51,7 +51,6 @@ export default function NavBar() {
               height={"50px"}
               w="100%"
               src="https://upload.wikimedia.org/wikipedia/vi/0/02/DotBlog_domain_logo.png?20220816010636"
-              alt="Dan Abramov"
             />
           </Link>
         </Box>
@@ -116,7 +115,9 @@ export default function NavBar() {
                   </Center>
                   <br />
                   <MenuDivider />
-                  <MenuItem>Your Profile</MenuItem>
+                  <MenuItem>
+                    <Link as={ReachLink} to="/profile">Your Profile</Link>
+                  </MenuItem>
                   <MenuItem>Settings</MenuItem>
                   <MenuItem>
                     <Link onClick={handleLogout}>Logout</Link>

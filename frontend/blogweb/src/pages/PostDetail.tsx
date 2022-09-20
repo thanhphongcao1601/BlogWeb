@@ -12,7 +12,6 @@ import {
   Spacer,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
 import { ModalEditPost } from "../components/ModalEditPost";
 import { PostAuthor } from "../components/PostAuthor";
 import { PostComment } from "../components/PostComment";
@@ -24,17 +23,13 @@ export default function PostDetail() {
   const userId = localStorage.getItem("userId");
 
   const {
-    handleGetPost,
     currentPost,
     userName,
     newComment,
     setNewComment,
     handleComment,
+    listComment
   } = usePostDetail();
-
-  useEffect(() => {
-    handleGetPost();
-  },[]);
 
   return (
     <>
@@ -42,7 +37,6 @@ export default function PostDetail() {
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
-        currentPost={currentPost}
       />
       <Container maxW={"7xl"} p="12" mt={"40px"}>
         <Box w="100%">
@@ -117,14 +111,14 @@ export default function PostDetail() {
               </Flex>
             </Box>
           </HStack>
-          {currentPost.comments
+          {listComment
             ?.slice(0)
             .reverse()
             .map((comment) => (
               <PostComment
                 key={comment._id}
-                name={comment.author?.name}
-                date={new Date(comment.createdAt)}
+                name={comment.author.name}
+                date={new Date(comment.createdAt ?? "")}
                 comment={comment.content}
               />
             ))}

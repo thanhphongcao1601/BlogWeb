@@ -7,6 +7,7 @@ import { Post } from "../models/Post";
 export function useNavBar() {
   const userName = localStorage.getItem("userName");
   const { colorMode, toggleColorMode } = useColorMode();
+  
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [listSearch, setListSearch] = useState([] as Post[]);

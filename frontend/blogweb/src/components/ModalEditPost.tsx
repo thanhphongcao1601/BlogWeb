@@ -13,73 +13,30 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Posts } from "../api/postRequest";
-import { Post } from "../models/Post";
+import React from "react";
 import { usePostDetail } from "../pages/PostDetail.hooks";
 
 interface UserDisclosureProps {
-  currentPost: Post;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 }
 
 export const ModalEditPost: React.FC<UserDisclosureProps> = (props) => {
-  const token = localStorage.getItem("token");
   const initialRef = React.useRef(null);
   const finalRef = React.useRef(null);
-  const [genres, setGenres] = useState([] as string[]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [imgLink, setImgLink] = useState("");
-  const navigate = useNavigate();
-
-  function initCurrentValue() {
-    setGenres(props.currentPost.genres ?? []);
-    setTitle(props.currentPost.title);
-    setContent(props.currentPost.content);
-    setImgLink(props.currentPost.imgLink ?? "");
-  }
-
-  function handleDeletePost() {
-    Posts.deletePost(props.currentPost._id ?? "", {
-      Authorization: `Bearer ${token}`,
-    })
-      .then((response) => {
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  function handleEditPost(onClose: () => void) {
-    let newPost: Post = {
-      genres: genres?.at(0) ? genres : ["other"],
-      imgLink: imgLink,
-      title: title,
-      content: content,
-    };
-
-    Posts.updatePost(
-      props.currentPost._id!,
-      { ...newPost },
-      { Authorization: `Bearer ${token}` }
-    )
-      .then((response) => {
-        onClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  useEffect(() => {
-    if (props.currentPost._id !== undefined) {
-      initCurrentValue();
-    }
-  }, [props.currentPost._id]);
+  const {
+    title,
+    content,
+    imgLink,
+    genres,
+    setGenres,
+    setTitle,
+    setContent,
+    setImgLink,
+    handleDeletePost,
+    handleEditPost
+  } = usePostDetail();
 
   return (
     <Modal

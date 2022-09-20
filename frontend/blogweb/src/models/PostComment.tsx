@@ -1,6 +1,6 @@
 import { Author } from "./Author";
 
-export interface Comment {
+export interface PostComment {
   _id: string;
   author: Author;
   content: string;

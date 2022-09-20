@@ -9,22 +9,12 @@ import {
 } from "@chakra-ui/react";
 
 import { PostCard } from "../components/PostCard";
-import { useEffect } from "react";
 import { useHome } from "./Home.hooks";
 import { ModalCreatePost } from "../components/ModalCreatePost";
 
 function Home() {
-  const { handleGetAllPosts, userName, listPost } = useHome();
+  const { userName, listPost } = useHome();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  useEffect(() => {
-    handleGetAllPosts();
-    console.log(listPost);
-  },[]);
-
-  useEffect(() => {
-    console.log("res",listPost);
-  },[listPost]);
 
   return (
     <>
@@ -50,7 +40,7 @@ function Home() {
                 imgLink={post.imgLink || ""}
                 title={post.title || "No title"}
                 content={post.content || ""}
-                genres={post.genres.length > 0 ? [...post.genres] : ["unknow"]}
+                genres={[...post.genres] ?? ["unknown"]}
                 author={post.author?.name || ""}
                 date={new Date(post.createdAt || "")}
               />

@@ -1,5 +1,5 @@
 import { Author } from "./Author";
-import { Comment } from "./Comment";
+import { PostComment } from "./PostComment";
 
 export interface Post {
   genres: string[];
@@ -8,7 +8,7 @@ export interface Post {
   title: string;
   content: string;
   author?: Author;
-  comments?: Comment[];
+  comments?: PostComment[];
   createdAt?: string;
   updatedAt?: string;
   __v?: number;

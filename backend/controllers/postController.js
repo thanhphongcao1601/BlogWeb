@@ -63,9 +63,16 @@ exports.commentPost = async (req, res, next) => {
       { $push: { comments: comment._id } },
       { new: true, runValidator: true }
     );
+
+    const postRespone = await Post.findById(postId)
+      .populate("author", "name")
+      .populate({
+        path: "comments",
+        populate: { path: "author", select: "name" },
+      });
     res.status(200).json({
       status: "success",
-      data: post,
+      data: postRespone,
     });
   } catch (error) {
     next(error);
